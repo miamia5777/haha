@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Baccarat VIP</title>
+  <meta name="description" content="Baccarat VIP Club - 百家乐线上游戏">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ Login Screen ═══ -->
+  <div id="login-screen" class="screen active">
+    <div class="login-pattern"></div>
+    <div class="login-frame">
+      <div class="login-corner tl"></div>
+      <div class="login-corner tr"></div>
+      <div class="login-corner bl"></div>
+      <div class="login-corner br"></div>
+    </div>
+    <div class="login-content">
+      <h1 class="login-title">BACCARAT</h1>
+      <p class="login-subtitle">VIP CLUB</p>
+      <div class="login-buttons">
+        <button class="login-btn btn-apple" onclick="app.login()">
+          <span class="btn-icon">🍎</span> Sign in with Apple
+        </button>
+        <button class="login-btn btn-facebook" onclick="app.login()">
+          <span class="btn-icon">f</span> Continue with Facebook
+        </button>
+        <button class="login-btn btn-google" onclick="app.login()">
+          <span class="btn-icon">G</span> Sign in with Google
+        </button>
+      </div>
+      <p class="login-terms">By playing, you agree to our Terms of Service.</p>
+    </div>
+  </div>
+
+  <!-- ═══ Lobby Screen ═══ -->
+  <div id="lobby-screen" class="screen">
+    <div class="lobby-bg-pattern"></div>
+    <div class="lobby-top-bar">
+      <button class="lobby-exit-btn" onclick="app.logout()">⬅ Exit</button>
+      <span class="lobby-balance">Balance: $ 88,888</span>
+      <button class="lobby-settings-btn">⚙️</button>
+    </div>
+    <div class="lobby-scroll" id="lobby-scroll">
+      <div class="lobby-grid" id="lobby-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Game Screen ═══ -->
+  <div id="game-screen" class="screen">
+    <div class="game-bg-pattern"></div>
+
+    <!-- Top bar -->
+    <div class="game-top-bar">
+      <button class="game-back-btn" onclick="game.leave()">◀ 返回</button>
+      <span class="game-balance" id="game-balance">💰 88,888</span>
+    </div>
+
+    <!-- Dealer area -->
+    <div class="game-dealer-area" id="dealer-container">
+      <canvas id="dealer-canvas"></canvas>
+    </div>
+
+    <!-- Info bar -->
+    <div class="game-info-bar">
+      <span class="game-round" id="game-round">局号:GC00001</span>
+      <span class="game-status" id="game-status">等待下注</span>
+      <span class="game-limit">限红:100~250,000</span>
+    </div>
+
+    <!-- Side bets (闲对 + 庄对) -->
+    <div class="game-side-bets">
+      <div class="side-bet" id="side-pp" data-zone="PP">
+        <span class="side-bet-name">闲对</span>
+        <span class="side-bet-payout">1:11</span>
+        <span class="side-bet-stats">👤<span class="side-bet-players"></span></span>
+        <div class="bet-indicator" id="bet-indicator-PP"></div>
+      </div>
+      <div class="side-bet" id="side-bp" data-zone="BP">
+        <span class="side-bet-name">庄对</span>
+        <span class="side-bet-payout">1:11</span>
+        <span class="side-bet-stats">👤<span class="side-bet-players"></span></span>
+        <div class="bet-indicator" id="bet-indicator-BP"></div>
+      </div>
+    </div>
+
+    <!-- Main bet zones -->
+    <div class="game-main-bets">
+      <div class="main-bet zone-player" id="zone-P" data-zone="P">
+        <div class="bet-percent" id="percent-P"></div>
+        <span class="bet-cn">闲</span>
+        <span class="bet-payout">1:1</span>
+        <span class="bet-mock-stats"><span class="mock-players"></span> <span class="mock-amount"></span></span>
+        <div class="bet-chip-stack" id="chip-stack-P"></div>
+      </div>
+      <div class="main-bet zone-tie" id="zone-T" data-zone="T">
+        <div class="bet-percent" id="percent-T"></div>
+        <span class="bet-cn">和</span>
+        <span class="bet-payout">1:8</span>
+        <span class="bet-mock-stats"><span class="mock-players"></span> <span class="mock-amount"></span></span>
+        <div class="bet-chip-stack" id="chip-stack-T"></div>
+      </div>
+      <div class="main-bet zone-banker" id="zone-B" data-zone="B">
+        <div class="bet-percent" id="percent-B"></div>
+        <span class="bet-cn">庄</span>
+        <span class="bet-payout">1:0.95</span>
+        <span class="bet-mock-stats"><span class="mock-players"></span> <span class="mock-amount"></span></span>
+        <div class="bet-chip-stack" id="chip-stack-B"></div>
+      </div>
+    </div>
+
+    <!-- Chips + Actions -->
+    <div class="game-chips-bar">
+      <button class="chip-action-btn" id="btn-cancel" onclick="game.clearBets()">✕ 取消</button>
+      <div class="chips-row" id="chips-row"></div>
+      <button class="chip-action-btn" id="btn-repeat" onclick="game.repeatBet()">↻ 重复</button>
+    </div>
+
+    <!-- Roads -->
+    <div class="game-roads" id="roads-container"></div>
+
+    <!-- Good Road Panel -->
+    <div class="good-road-panel" id="good-road-panel">
+      <div class="good-road-header">
+        <div class="gr-header-left">
+          <button class="gr-icon-btn">⚙️</button>
+          <button class="gr-icon-btn">🍷</button>
+          <button class="gr-icon-btn">↻</button>
+        </div>
+        <div class="gr-header-title">好路投注</div>
+        <button class="good-road-close" onclick="game.toggleGoodRoad()">✕</button>
+      </div>
+      <div class="good-road-list" id="good-road-list"></div>
+      <div class="good-road-footer">
+        <button class="gr-nav-btn">&lt;</button>
+        <div class="gr-chips" id="gr-chips-row"></div>
+        <button class="gr-nav-btn">&gt;</button>
+      </div>
+    </div>
+
+    <!-- Win overlay canvas -->
+    <canvas id="win-overlay" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;"></canvas>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/game_engine.js"></script>
+  <script src="js/canvas/dealer.js"></script>
+  <script src="js/canvas/roads.js"></script>
+  <script src="js/canvas/effects.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>
