@@ -288,9 +288,8 @@ const game = {
     // Show cards with animation
     this.dealer.setResult(res.playerHand, res.bankerHand, res.playerScore, res.bankerScore);
 
-    // Delayed result after card reveal
-    const totalCards = res.playerHand.length + res.bankerHand.length;
-    setTimeout(() => this._showResult(res), totalCards * 300 + 200);
+    // Delayed result after card reveal (Total sequence approx 5.5-6s)
+    setTimeout(() => this._showResult(res), 6000);
   },
 
   _showResult(res) {
@@ -318,6 +317,25 @@ const game = {
 
     // Payout — directly add to balance with roll-up
     const payout = this.engine.calculatePayout(this.bets, res);
+    const totalBet = Object.values(this.bets).reduce((a, b) => a + b, 0);
+    const netProfit = payout - totalBet;
+
+    // Track profit in history
+    if (totalBet > 0) {
+      app.addToHistory({
+        tId: this.tableId,
+        tName: document.querySelector('.table-card-title')?.innerText.split(' ')[0] || '百家乐',
+        history: this.engine.history,
+        stats: {
+          total: this.engine.history.length,
+          banker: this.engine.history.filter(h => h[0] === 'B').length,
+          player: this.engine.history.filter(h => h[0] === 'P').length,
+          tie: this.engine.history.filter(h => h[0] === 'T').length
+        },
+        trend: '' 
+      }, netProfit);
+    }
+
     if (payout > 0) {
       if (this.winOverlay) {
         this.winOverlay.triggerWinBurst(null, null, payout, 120);

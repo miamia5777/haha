@@ -48,22 +48,55 @@ class DealerCanvas {
   }
 
   setResult(playerHand, bankerHand, pScore, bScore) {
-    this.playerCards = playerHand.map(c => ({ rank: c.rank, suit: c.suit }));
-    this.bankerCards = bankerHand.map(c => ({ rank: c.rank, suit: c.suit }));
-    this.playerScore = pScore;
-    this.bankerScore = bScore;
+    // We need to keep values for intermediate score calculation
+    this.playerCards = playerHand.map(c => ({ rank: c.rank, suit: c.suit, value: c.value }));
+    this.bankerCards = bankerHand.map(c => ({ rank: c.rank, suit: c.suit, value: c.value }));
+    this.playerScoreFinal = pScore;
+    this.bankerScoreFinal = bScore;
+    
+    // Initial scores (first 2 cards)
+    this.playerScoreInitial = (this.playerCards[0].value + this.playerCards[1].value) % 10;
+    this.bankerScoreInitial = (this.bankerCards[0].value + this.bankerCards[1].value) % 10;
+
     this.showCards = true;
     this.cardRevealCount = 0;
-    this.totalCards = this.playerCards.length + this.bankerCards.length;
+    
+    if (this._animTimer) clearTimeout(this._animTimer);
+    this._runSequence();
+  }
 
-    this._animTimer = setInterval(() => {
-      this.cardRevealCount++;
-      this.draw();
-      if (this.cardRevealCount >= this.totalCards) {
-        clearInterval(this._animTimer);
-        this._animTimer = null;
-      }
-    }, 300);
+  _runSequence() {
+    const sequence = [];
+    
+    // Steps 1-4: P1, P2, B1, B2
+    sequence.push({ delay: 600, step: 1 }); // P1
+    sequence.push({ delay: 600, step: 2 }); // P2
+    sequence.push({ delay: 600, step: 3 }); // B1
+    sequence.push({ delay: 600, step: 4 }); // B2
+    
+    // Step 5: Pause 1 second
+    sequence.push({ delay: 1000, step: 4 }); // Stay at step 4
+    
+    // Step 6+: Optional 3rd cards
+    let nextStep = 5;
+    if (this.playerCards.length > 2) {
+      sequence.push({ delay: 600, step: nextStep++ }); // P3
+    }
+    if (this.bankerCards.length > 2) {
+      sequence.push({ delay: 600, step: nextStep++ }); // B3
+    }
+
+    let i = 0;
+    const next = () => {
+      if (i >= sequence.length) return;
+      this._animTimer = setTimeout(() => {
+        this.cardRevealCount = sequence[i].step;
+        this.draw();
+        i++;
+        next();
+      }, sequence[i].delay);
+    };
+    next();
   }
 
   draw() {
@@ -185,37 +218,77 @@ class DealerCanvas {
       // Player cards (left)
       const pStartX = w * 0.12;
       const pY = h * 0.68;
+      
+      // Determine how many cards to show based on reveal count logic
+      // Reveal order: P1(1), B1(2), P2(3), B2(4), P3(5?), B3(6?)
+      
       this.playerCards.forEach((card, i) => {
         const angle = -5 + i * 5;
-        if (i < this.cardRevealCount) {
+        let isRevealed = false;
+        let isDrawn = false; 
+
+        if (i === 0) { isDrawn = true; if (this.cardRevealCount >= 1) isRevealed = true; }
+        if (i === 1) { isDrawn = true; if (this.cardRevealCount >= 2) isRevealed = true; }
+        if (i === 2) { 
+          if (this.cardRevealCount >= 4) isDrawn = true; 
+          if (this.cardRevealCount >= 5) isRevealed = true; 
+        }
+
+        if (isRevealed) {
           drawPokerCard(ctx, pStartX + i * (cardW + 4), pY, cardW, cardH, card.rank, card.suit, true, angle);
-        } else {
-          drawPokerCard(ctx, pStartX + i * (cardW + 4), pY, cardW, cardH, '', '', false);
+        } else if (isDrawn) {
+          drawPokerCard(ctx, pStartX + i * (cardW + 4), pY, cardW, cardH, '', '', false, angle);
         }
       });
-
+ 
       // Banker cards (right)
       const bStartX = w * 0.58;
       const bY = h * 0.68;
-      const pCount = this.playerCards.length;
       this.bankerCards.forEach((card, i) => {
-        const revealIdx = pCount + i;
         const angle = -5 + i * 5;
-        if (revealIdx < this.cardRevealCount) {
+        let isRevealed = false;
+        let isDrawn = false;
+
+        if (i === 0) { isDrawn = true; if (this.cardRevealCount >= 3) isRevealed = true; }
+        if (i === 1) { isDrawn = true; if (this.cardRevealCount >= 4) isRevealed = true; }
+        if (i === 2) {
+          const b3DrawnStep = (this.playerCards.length > 2) ? 5 : 4; 
+          const b3RevealStep = (this.playerCards.length > 2) ? 6 : 5;
+          if (this.cardRevealCount >= b3DrawnStep) isDrawn = true;
+          if (this.cardRevealCount >= b3RevealStep) isRevealed = true;
+        }
+
+        if (isRevealed) {
           drawPokerCard(ctx, bStartX + i * (cardW + 4), bY, cardW, cardH, card.rank, card.suit, true, angle);
-        } else {
-          drawPokerCard(ctx, bStartX + i * (cardW + 4), bY, cardW, cardH, '', '', false);
+        } else if (isDrawn) {
+          drawPokerCard(ctx, bStartX + i * (cardW + 4), bY, cardW, cardH, '', '', false, angle);
         }
       });
-
+ 
       // Score badges
-      if (this.cardRevealCount >= pCount && this.playerScore !== null) {
+      // Player Score: Show initial after P2 (step 2), update to final after P3 (step 5)
+      if (this.cardRevealCount >= 2) {
+        let currentPScore = this.playerScoreInitial;
+        if (this.playerCards.length > 2 && this.cardRevealCount >= 5) {
+          currentPScore = this.playerScoreFinal;
+        } else if (this.playerCards.length === 2) {
+          currentPScore = this.playerScoreFinal;
+        }
         const bx = pStartX + this.playerCards.length * (cardW + 4) + 5;
-        this._drawScoreBadge(ctx, bx, pY + 12, this.playerScore, COLORS.PLAYER_BLUE);
+        this._drawScoreBadge(ctx, bx, pY + 12, currentPScore, COLORS.PLAYER_BLUE);
       }
-      if (this.cardRevealCount >= this.totalCards && this.bankerScore !== null) {
+
+      // Banker Score: Show initial after B2 (step 4), update to final after B3 (step 5 or 6)
+      if (this.cardRevealCount >= 4) {
+        let currentBScore = this.bankerScoreInitial;
+        const b3Step = (this.playerCards.length > 2) ? 6 : 5;
+        if (this.bankerCards.length > 2 && this.cardRevealCount >= b3Step) {
+          currentBScore = this.bankerScoreFinal;
+        } else if (this.bankerCards.length === 2) {
+          currentBScore = this.bankerScoreFinal;
+        }
         const bx = bStartX + this.bankerCards.length * (cardW + 4) + 5;
-        this._drawScoreBadge(ctx, bx, bY + 12, this.bankerScore, COLORS.BANKER_RED);
+        this._drawScoreBadge(ctx, bx, bY + 12, currentBScore, COLORS.BANKER_RED);
       }
     } else {
       // Placeholder face-down cards
