@@ -44,7 +44,11 @@
     <div class="lobby-top-bar">
       <button class="lobby-exit-btn" onclick="app.logout()">⬅ Exit</button>
       <span class="lobby-balance">Balance: $ 88,888</span>
-      <button class="lobby-settings-btn">⚙️</button>
+      <div class="lobby-top-actions">
+        <button class="lobby-icon-btn">🔍</button>
+        <button class="lobby-icon-btn">🔊</button>
+        <button class="lobby-icon-btn">🧰</button>
+      </div>
     </div>
     <div class="lobby-scroll" id="lobby-scroll">
       <div class="tab-content active" id="tab-game">
@@ -62,9 +66,25 @@
         </div>
         <div class="lobby-grid" id="good-road-grid"></div>
       </div>
+      <div class="tab-content" id="tab-multi">
+        <div class="multi-table-list" id="multi-table-grid"></div>
+      </div>
       <div class="tab-content" id="tab-history">
         <div class="history-list" id="history-grid"></div>
       </div>
+    </div>
+
+    <!-- Multi Betting Bar (Fixed above Nav) -->
+    <div class="multi-betting-bar" id="multi-betting-bar" style="display: none;">
+      <button class="multi-action-btn">✕ 取消</button>
+      <div class="multi-chips-row">
+        <div class="m-chip chip-5">5</div>
+        <div class="m-chip chip-10 active">10</div>
+        <div class="m-chip chip-20">20</div>
+        <div class="m-chip chip-50">50</div>
+        <div class="m-chip chip-100">100</div>
+      </div>
+      <button class="multi-action-btn">↺ 重复</button>
     </div>
 
     <!-- Bottom Nav -->
@@ -76,6 +96,10 @@
       <div class="nav-item" onclick="app.switchTab('good')">
         <span class="nav-icon">📈</span>
         <span class="nav-label">好路</span>
+      </div>
+      <div class="nav-item" onclick="app.switchTab('multi')">
+        <span class="nav-icon">🎴</span>
+        <span class="nav-label">多台</span>
       </div>
       <div class="nav-item" onclick="app.switchTab('history')">
         <span class="nav-icon">📜</span>

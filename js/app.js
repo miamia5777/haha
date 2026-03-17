@@ -136,6 +136,12 @@ const app = {
       content.classList.toggle('active', content.id === `tab-${tabId}`);
     });
 
+    // Toggle Multi Betting Bar
+    const multiBar = document.getElementById('multi-betting-bar');
+    if (multiBar) {
+      multiBar.style.display = (tabId === 'multi') ? 'flex' : 'none';
+    }
+
     if (tabId === 'game') {
       this._generateTables(true); // Force refresh
       let filtered = this.allTables;
@@ -144,6 +150,7 @@ const app = {
       } else if (this.currentGameMode === 'speed') {
         filtered = this.allTables.filter(t => t.tName.includes('极速') || t.tName.includes('急速'));
       }
+      this._updateFilterCounts();
       this._renderTables(filtered, 'lobby-grid');
     } else if (tabId === 'good') {
       this._generateTables(true); // Force refresh
@@ -164,6 +171,9 @@ const app = {
         });
       });
       this._renderTables(goodRoads, 'good-road-grid');
+    } else if (tabId === 'multi') {
+      this._generateTables(true);
+      this._renderMultiTables(this.allTables, 'multi-table-grid');
     } else if (tabId === 'history') {
       this._populateHistory();
     }
@@ -218,6 +228,23 @@ const app = {
 
       this.allTables.push({ tId, tName, status, online, history, stats, trend });
     }
+    this._updateFilterCounts();
+  },
+
+  _updateFilterCounts() {
+    const counts = {
+      all: this.allTables.length,
+      classic: this.allTables.filter(t => t.tName.includes('国际') || t.tName.includes('咪牌') || t.tName.includes('贵宾')).length,
+      speed: this.allTables.filter(t => t.tName.includes('极速') || t.tName.includes('急速')).length
+    };
+    
+    const allEl = document.getElementById('filter-game-all');
+    const classicEl = document.getElementById('filter-game-classic');
+    const speedEl = document.getElementById('filter-game-speed');
+    
+    if (allEl) allEl.innerHTML = `全部 <span class="filter-count">${counts.all}桌</span>`;
+    if (classicEl) classicEl.innerHTML = `经典百家乐 <span class="filter-count">${counts.classic}桌</span>`;
+    if (speedEl) speedEl.innerHTML = `极速百家乐 <span class="filter-count">${counts.speed}桌</span>`;
   },
 
   _renderTables(tables, containerId) {
@@ -374,6 +401,64 @@ const app = {
       });
       grid.appendChild(card);
 
+      requestAnimationFrame(() => {
+        this._drawMiniRoad(canvasId, history);
+      });
+    });
+  },
+
+  _renderMultiTables(tables, gridId) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    
+    tables.forEach(table => {
+      const { tId, tName, status, online, history, stats, trend } = table;
+      const card = document.createElement('div');
+      card.className = 'gr-card';
+      const canvasId = `multi-road-${tId}`;
+      
+      const isSpeed = tName.includes('极速') || tName.includes('急速');
+      const trendColor = trend.includes('庄') ? 'trend-red' : 'trend-blue';
+
+      card.innerHTML = `
+        <div class="gr-card-top">
+          <span class="gr-card-title">${tName} ${tId}</span>
+          <div class="gr-card-timer">
+            <div class="gr-timer-bar"></div>
+            <span class="gr-timer-text">18</span>
+          </div>
+          <span class="gr-card-trend ${trendColor}">${trend}</span>
+        </div>
+        <div class="gr-card-body">
+          <div class="gr-roadmap">
+            <canvas id="${canvasId}"></canvas>
+          </div>
+          <div class="gr-actions">
+            <div class="gr-bet-row">
+              <button class="gr-btn-bet gr-btn-player">
+                <span style="font-size:14px">闲</span>
+                <span class="gr-payout">1:1</span>
+              </button>
+              <button class="gr-btn-bet gr-btn-banker">
+                <span style="font-size:14px">庄</span>
+                <span class="gr-payout">1:0.95</span>
+              </button>
+            </div>
+            <div class="gr-sub-actions">
+              <button class="gr-btn-sub">和 1:8</button>
+              <button class="gr-btn-sub">对子 1:11</button>
+            </div>
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('button')) {
+          this.addToHistory(table);
+          game.enterTable(tId, history);
+        }
+      });
+      grid.appendChild(card);
+      
       requestAnimationFrame(() => {
         this._drawMiniRoad(canvasId, history);
       });

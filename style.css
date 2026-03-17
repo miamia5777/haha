@@ -199,12 +199,25 @@ html, body {
   font-weight: 700;
 }
 
-.lobby-settings-btn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
+.lobby-top-actions {
+  display: flex;
+  gap: 12px;
 }
+
+.lobby-icon-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.lobby-icon-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
 
 .lobby-scroll {
   flex: 1;
@@ -282,6 +295,93 @@ html, body {
   color: #000;
   box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
 }
+
+.filter-count {
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+/* ── Multi Table Tab ── */
+.multi-table-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: #f4f5f7; /* Matching good-road-panel BG */
+  min-height: 100%;
+  padding-bottom: 80px; /* Space for betting bar */
+}
+.multi-table-list .gr-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Multi Betting Bar ── */
+.multi-betting-bar {
+  position: absolute;
+  bottom: 64px; /* Above nav bar */
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #1a0505; /* Deep dark reddish/brown */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-top: 1px solid rgba(212,175,55,0.2);
+  z-index: 15;
+}
+
+.multi-action-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #ccc;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.multi-chips-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.m-chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px dashed rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;
+}
+
+.m-chip.active {
+  transform: scale(1.1);
+  border-style: solid;
+}
+.m-chip.active::after {
+  content: '';
+  position: absolute;
+  top: -5px; left: -5px; right: -5px; bottom: -5px;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--gold);
+}
+
+.chip-5 { background: radial-gradient(circle, #2e7d32, #1b5e20); }
+.chip-10 { background: radial-gradient(circle, #1565c0, #0d47a1); }
+.chip-20 { background: radial-gradient(circle, #ef6c00, #e65100); }
+.chip-50 { background: radial-gradient(circle, #7b1fa2, #4a148c); }
+.chip-100 { background: radial-gradient(circle, #424242, #212121); color: var(--gold); }
 
 .lobby-grid {
   display: grid;
