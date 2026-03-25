@@ -172,7 +172,7 @@ const app = {
       });
       this._renderTables(goodRoads, 'good-road-grid');
     } else if (tabId === 'multi') {
-      this._generateTables(true);
+      this._generateTables(true); // Force re-generation with new random data
       this._renderMultiTables(this.allTables, 'multi-table-grid');
     } else if (tabId === 'history') {
       this._populateHistory();
@@ -183,11 +183,12 @@ const app = {
     if (this.allTables.length > 0 && !force) return;
     this.allTables = []; // Clear existing
 
-    const prefixes = ['极速百家乐', '咪牌百家乐', '国际百家乐', 'VIP百家乐', '贵宾百家乐', '急速无佣'];
+    const prefixes = ['极速百家乐', '咪牌百家乐', '国际百家乐', 'VIP百家乐', '贵宾百家乐', '急速无佣', '旗舰百家乐', '现场百家乐'];
     const statuses = ['请下注 15s', '请下注 08s', '请下注 03s', '开牌中', '结算中', '洗牌中'];
 
-    for (let idx = 0; idx < 20; idx++) {
-      const tId = idx + 1;
+    // Generate 30 tables to have more variety
+    for (let idx = 0; idx < 30; idx++) {
+      const tId = Math.floor(Math.random() * 9000) + 1000; // Random 4-digit ID
       const tName = prefixes[Math.floor(Math.random() * prefixes.length)];
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const online = Math.floor(Math.random() * 451) + 50;
@@ -228,6 +229,10 @@ const app = {
 
       this.allTables.push({ tId, tName, status, online, history, stats, trend });
     }
+
+    // Shuffle tables to ensure different order every time
+    this.allTables.sort(() => Math.random() - 0.5);
+    
     this._updateFilterCounts();
   },
 
@@ -446,7 +451,8 @@ const app = {
             </div>
             <div class="gr-sub-actions">
               <button class="gr-btn-sub">和 1:8</button>
-              <button class="gr-btn-sub">对子 1:11</button>
+              <button class="gr-btn-sub" onclick="game.clearBets()">取消</button>
+              <button class="gr-btn-sub" onclick="game.repeatBet()">重复</button>
             </div>
           </div>
         </div>

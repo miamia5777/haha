@@ -235,6 +235,18 @@ html, body {
 }
 .tab-content.active {
   display: block;
+  animation: tabFadeIn 0.35s ease-out;
+}
+
+@keyframes tabFadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 /* ── Good Road Header ── */
@@ -326,10 +338,22 @@ html, body {
   background: #1a0505; /* Deep dark reddish/brown */
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Center the chips */
   padding: 0 12px;
   border-top: 1px solid rgba(212,175,55,0.2);
   z-index: 15;
+}
+
+.good-road-footer {
+  height: 80px;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the chips */
+  padding: 0 15px;
+  gap: 10px;
+  z-index: 2;
 }
 
 .multi-action-btn {
@@ -1335,8 +1359,9 @@ html, body {
   border: none;
   border-radius: 4px;
   background: #f0f0f0;
-  color: #aaa;
-  font-size: 12px;
+  color: #11cc55;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -1347,9 +1372,18 @@ html, body {
   box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  justify-content: space-between;
+  padding: 0 15px;
   gap: 10px;
   z-index: 2;
+}
+
+.good-road-footer .multi-action-btn {
+  background: #f0f0f0;
+  border-color: #ddd;
+  color: #666;
+  font-weight: 700;
+  padding: 10px 15px;
 }
 .gr-nav-btn {
   background: transparent;

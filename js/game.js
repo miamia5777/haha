@@ -409,8 +409,9 @@ const game = {
               <button class="gr-btn-bet gr-btn-banker"><span>庄</span><span class="gr-payout">1:0.95</span></button>
             </div>
             <div class="gr-sub-actions">
-              <button class="gr-btn-sub">取消</button>
-              <button class="gr-btn-sub">重复</button>
+              <button class="gr-btn-sub">和 1:8</button>
+              <button class="gr-btn-sub" onclick="game.clearBets()">取消</button>
+              <button class="gr-btn-sub" onclick="game.repeatBet()">重复</button>
             </div>
           </div>
         </div>
@@ -424,6 +425,13 @@ const game = {
     });
 
     // Populate chips in footer
+    const footer = document.querySelector('.good-road-footer');
+    if (footer) {
+      footer.innerHTML = `
+        <div class="gr-chips" id="gr-chips-row"></div>
+      `;
+    }
+
     const chipsRow = document.getElementById('gr-chips-row');
     if (chipsRow && chipsRow.children.length === 0) {
       const values = [5, 10, 20, 50, 100];
